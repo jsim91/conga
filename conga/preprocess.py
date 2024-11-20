@@ -373,7 +373,8 @@ def read_dataset(
     # read the barcode/clonotype mapping info
     barcode2kpcs = {}
     barcode2tcr = {}
-
+    missing_kpca_file = False
+    
     for line in open(bcmap_file,'r'):
         l = line[:-1].split('\t')
         if l[0] == 'clone_id': continue # header line
@@ -389,7 +390,7 @@ def read_dataset(
             if not missing_kpca_file:
                 barcode2kpcs[ bc ] = kpcs
             assert bc in barcodes # the barcodes list before preprocessing...
-
+    
     mask = [ x in barcode2tcr for x in adata.obs.index ]
 
     print(f'Reducing to the {np.sum(mask)} barcodes (out of {adata.shape[0]}) with paired TCR sequence data')
@@ -399,10 +400,11 @@ def read_dataset(
 
     if np.sum(mask)==0:
         return adata # seem to get an error below; who cares anyhow?
-
-    if not missing_kpca_file: # stash the kPCA info in adata.obsm
-        X_kpca = np.array( [ barcode2kpcs[x] for x in adata.obs.index ] )
-        adata.obsm['X_pca_tcr'] = X_kpca
+    
+    bc_keyset = set(barcode2kpcs.keys())
+    adata = adata[adata.obs.index.isin(bc_keyset)]
+    X_kpca = np.array( [ barcode2kpcs[x] for x in adata.obs.index ] )
+    adata.obsm['X_pca_tcr'] = X_kpca
 
     tcrs = [ barcode2tcr[x] for x in adata.obs.index ]
     store_tcrs_in_adata( adata, tcrs )
