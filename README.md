@@ -110,7 +110,7 @@ conda install pyyaml #optional for using yaml-formatted configuration files for 
 
 Type this command wherever you want the `conga/` directory to appear:
 ```
-git clone https://github.com/phbradley/conga.git
+git clone https://github.com/jsim91/conga.git
 ```
 
 If you don't have `git` installed you could go click on the big green `Code`
