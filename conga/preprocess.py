@@ -392,10 +392,11 @@ def read_dataset(
             assert bc in barcodes # the barcodes list before preprocessing...
     
     mask = [ x in barcode2tcr for x in adata.obs.index ]
+    bc_mask = adata.obs.index[mask]
 
     print(f'Reducing to the {np.sum(mask)} barcodes (out of {adata.shape[0]}) with paired TCR sequence data')
-    #adata = adata[mask,:]
-    adata = adata[mask,:].copy()
+    #adata = adata[mask,:].copy()
+    adata = adata[adata.obs.index.isin(bc_mask)].copy()
     adata.uns['conga_stats']['num_cells_w_tcr'] = adata.shape[0]
 
     if np.sum(mask)==0:
